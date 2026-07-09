@@ -1,9 +1,8 @@
 # 📦 Inventory Management System (IMS)
 
-Aplikasi web **Inventory Management System (IMS)** ini dirancang untuk mendigitalkan pencatatan aset, mencegah data ganda, mempermudah pemantauan stok secara real-time, dan mempercepat pembuatan laporan peminjaman barang. 
+**Inventory Management System (IMS)** adalah aplikasi berbasis web yang dikembangkan untuk membantu proses pengelolaan inventaris secara lebih terstruktur dan efisien. Aplikasi ini memungkinkan pengguna mengelola data kategori dan barang, mencatat transaksi peminjaman serta pengembalian, memantau ketersediaan stok secara real-time, dan melihat ringkasan informasi melalui dashboard yang interaktif. Dengan proses yang terdigitalisasi, pencatatan inventaris menjadi lebih rapi, meminimalkan duplikasi data, serta memudahkan pemantauan dan pelaporan.
 
-Aplikasi dibangun menggunakan **Laravel 12**, **MySQL 8**, **Tailwind CSS**, dan **Laravel Breeze** untuk otentikasi & hak akses (RBAC), serta menggunakan visualisasi data dinamis dari **Chart.js** yang diselaraskan dengan **INLIFE SaaS Design System**.
-
+Aplikasi ini dibangun menggunakan **Laravel 12**, **MySQL 8**, **Tailwind CSS**, **Laravel Breeze** untuk autentikasi dan Role-Based Access Control (RBAC), serta **Chart.js** untuk menyajikan visualisasi data.
 ---
 
 ## 🔑 Akun Login Pengujian (Testing Accounts)
