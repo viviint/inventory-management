@@ -16,7 +16,7 @@ class ProductController extends Controller
     /**
      * Display a paginated listing of products with optional search and category filter.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Product::class);
 
@@ -37,6 +37,10 @@ class ProductController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        if ($this->isApiOrPostman($request)) {
+            return response()->json($products, 200);
+        }
+
         return view('products.index', compact('products', 'categories'));
     }
 
@@ -55,7 +59,7 @@ class ProductController extends Controller
     /**
      * Store a newly created product in storage.
      */
-    public function store(StoreProductRequest $request): RedirectResponse
+    public function store(StoreProductRequest $request)
     {
         $data = $request->validated();
 
@@ -63,7 +67,14 @@ class ProductController extends Controller
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
-        Product::create($data);
+        $product = Product::create($data);
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message' => 'Product created successfully.',
+                'product' => $product->load('category'),
+            ], 201);
+        }
 
         return redirect()
             ->route('products.index')
@@ -73,7 +84,7 @@ class ProductController extends Controller
     /**
      * Display the specified product detail.
      */
-    public function show(Product $product): View
+    public function show(Request $request, Product $product)
     {
         $this->authorize('view', $product);
 
@@ -81,6 +92,12 @@ class ProductController extends Controller
             'category',
             'borrowingDetails' => fn ($q) => $q->whereNull('returned_at')->with('borrowing'),
         ]);
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'product' => $product,
+            ], 200);
+        }
 
         return view('products.show', compact('product'));
     }
@@ -100,7 +117,7 @@ class ProductController extends Controller
     /**
      * Update the specified product in storage.
      */
-    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
+    public function update(UpdateProductRequest $request, Product $product)
     {
         $data = $request->validated();
 
@@ -114,6 +131,13 @@ class ProductController extends Controller
 
         $product->update($data);
 
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message' => 'Product updated successfully.',
+                'product' => $product->fresh('category'),
+            ], 200);
+        }
+
         return redirect()
             ->route('products.index')
             ->with('success', 'Product updated successfully.');
@@ -123,11 +147,16 @@ class ProductController extends Controller
      * Remove the specified product from storage.
      * Blocked if the product has unreturned borrowings.
      */
-    public function destroy(Product $product): RedirectResponse
+    public function destroy(Request $request, Product $product)
     {
         $this->authorize('delete', $product);
 
         if ($product->hasActiveBorrowings()) {
+            if ($this->isApiOrPostman($request)) {
+                return response()->json([
+                    'message' => 'Cannot delete a product with active (unreturned) borrowings.',
+                ], 422);
+            }
             return redirect()
                 ->route('products.index')
                 ->with('error', 'Cannot delete a product with active (unreturned) borrowings.');
@@ -138,6 +167,12 @@ class ProductController extends Controller
         }
 
         $product->delete();
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message' => 'Product deleted successfully.',
+            ], 200);
+        }
 
         return redirect()
             ->route('products.index')

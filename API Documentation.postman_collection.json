@@ -1,0 +1,2684 @@
+{
+  "info": {
+    "_postman_id": "d59246b6-be0a-4b4b-861c-f02c15647369",
+    "name": "Inventory Management System API",
+    "description": "Koleksi lengkap Postman API untuk aplikasi **Laravel 12 Inventory Management System (IMS)**.\n\n### 🔒 Catatan Otentikasi:\n1. Otentikasi menggunakan session cookie bawaan Laravel Breeze/Sanctum.\n2. **Langkah Wajib Sebelum Menguji:**\n   - Jalankan request **1. Auth -> Sanctum CSRF Cookie**.\n   - Jalankan request **1. Auth -> Login as Admin / Staff / Manager**.\n   - Setelah berhasil login, Postman akan otomatis menyimpan cookie session di Cookie Jar dan menyertakannya untuk seluruh request berikutnya.\n3. Seluruh request pada koleksi ini telah dikonfigurasi secara default dengan header `Accept: application/json` dan `X-Requested-With: XMLHttpRequest` serta pre-request script pengambil token CSRF.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54408094",
+    "_collection_link": "https://go.postman.co/collection/54408094-d59246b6-be0a-4b4b-861c-f02c15647369?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Auth (Breeze & Sanctum)",
+      "item": [
+        {
+          "name": "Sanctum CSRF Cookie",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204 No Content or 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "// Automatically extract XSRF-TOKEN from cookies or Set-Cookie header and save to environment variable",
+                  "let xsrfCookie = pm.cookies.get('XSRF-TOKEN');",
+                  "if (xsrfCookie) {",
+                  "    pm.environment.set('xsrf_token', decodeURIComponent(xsrfCookie));",
+                  "    console.log('Saved XSRF-TOKEN from Cookie Jar:', pm.environment.get('xsrf_token'));",
+                  "} else {",
+                  "    let headers = pm.response.headers.all();",
+                  "    for (let header of headers) {",
+                  "        if (header.key.toLowerCase() === 'set-cookie' && header.value.includes('XSRF-TOKEN=')) {",
+                  "            let match = header.value.match(/XSRF-TOKEN=([^;]+)/);",
+                  "            if (match && match[1]) {",
+                  "                pm.environment.set('xsrf_token', decodeURIComponent(match[1]));",
+                  "                console.log('Saved XSRF-TOKEN from Set-Cookie header:', pm.environment.get('xsrf_token'));",
+                  "            }",
+                  "        }",
+                  "    }",
+                  "}",
+                  "pm.test('XSRF-TOKEN is successfully saved for authentication', function () {",
+                  "    pm.expect(pm.environment.get('xsrf_token') || pm.cookies.has('XSRF-TOKEN')).to.be.ok;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sanctum/csrf-cookie",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sanctum",
+                "csrf-cookie"
+              ]
+            },
+            "description": "Mempersiapkan dan menginisialisasi cookie keamanan Laravel Sanctum CSRF protection. Wajib dipanggil sebelum melakukan proses login atau registrasi pertama kali."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/sanctum/csrf-cookie",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "sanctum",
+                    "csrf-cookie"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 15:08:14 GMT"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IjJCTmQrbXlmL3J3T1Z6em1reCttU3c9PSIsInZhbHVlIjoiWHZrS0d0VE5GQXIxRzFFQ3RyT1VBcjFSdnVRMVU2eU93NExUMjZNL1hSeEMzVXIvTGRSRVhvNEFLUGREQzR2N0V2dVB0cEZ4NE54NU9ZNVc2WVZYdTIyczFTSHNxMGRadGZFUHRZemFkS3F2UEJNUEh6bkZzNEZuY1hSSS9jYzUiLCJtYWMiOiI2MDgxOWMwOTc2Y2FkMjQ4Yjg3NWZjYzdhM2RjZGM4NWFhZTBjNmVmMGVmYjBlNTVjNTc1MTdiODA3MzE1YjczIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 17:08:15 GMT; Max-Age=7199; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6IkxLWDhDakwwMjJmNk54TDhoUFN0cWc9PSIsInZhbHVlIjoiQjFUbUpWUVBCaDBzV2FENXN4VUlnSFdUNkxYYVlqSFJBVjVPR3E0L09rSlNHSWxTTEJjWnJJZC9qTVpZd2lJUk5DTkpHRGxycVVOa0pna3lUY0dPWWF0SCsvVit2RGl1aGQ4bktRMk1aZit5eGhqazZIRE1CMGtyRm42NytqYS8iLCJtYWMiOiI0OTYyZTY4NTFhYjRmZTRmYjdlY2FkN2U4Mzc5YmI0MDNiNTQ5MDUwYjYzNGNlNDg5OGIwYjIyNDg2YTRmM2U1IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 17:08:15 GMT; Max-Age=7199; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": null
+            }
+          ]
+        },
+        {
+          "name": "Login as Admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login request succeeded (200 OK or 204 No Content)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "pm.test('Laravel session cookie is created', function () {",
+                  "    pm.expect(pm.cookies.has('inventory-management-session')).to.be.true;",
+                  "});",
+                  "console.log('Logged in successfully as Admin.');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{admin_email}}",
+                  "description": "Email akun Admin (admin@inventory.test)",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Melakukan otentikasi login sebagai **Admin** (hak akses penuh untuk kelola user, kategori, produk, peminjaman, dan dashboard)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "email",
+                      "value": "{{admin_email}}",
+                      "description": "Email akun Admin (admin@inventory.test)",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "{{password}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 15:39:11 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6InJ2d2JuZ0J5MC8rU3hYZlc3WHhPU2c9PSIsInZhbHVlIjoieldyUW1GZjBseFlnRVIwS2hkck5FWnBnNEdLTUpEU0FsWWN5QWVEbk1DS2FBazM5WGprTE9EZlBZSXQ1YmkrYUNaSUNRNVZKanIvM2Q1VDFPUWFZQTlKeUdVNEZEYUpiQmpnc1J2NmFvNUxJL0ROOUZJM3pmSlBNaGZvUlF3cGQiLCJtYWMiOiI1ODAxOThiYTQ1ZjkxYjMyODEzOTc0Y2U4NDA4MDExMDY1NGY3Njg5Y2QyYTYyYzk1YmFiZTEyNmU2MTRhYzYwIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 17:39:11 GMT; Max-Age=7199; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6Imx2VzBUWkc2WDUvcW83anBIYWEvd1E9PSIsInZhbHVlIjoiaVg4SHVjckMxVDUzUm9qdEhBaVZNT2k0cmN1RFVqQWd2RGpmRzJKQ29ZL0hYU3YxcWM2Z2RHRkt3blM4WWFNaFhqN1FIL24rbVZQRGloenhBa0FkdjdiYm1Xc0t3NUNVckpPaVlEbEhOU25DTHJhbytyYVRPbGNGazRmZ0F6cVQiLCJtYWMiOiJiMDVlNWM0ZGNhNGFlOWU2N2FmYzBhMGE0MGE1ZjRiZWRjZmM4NTc4MmM0NWM4YTM3MzJlNjE0OTdmYjJlZTAzIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 17:39:11 GMT; Max-Age=7199; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Login successful\",\n    \"user\": {\n        \"id\": 1,\n        \"role_id\": 1,\n        \"name\": \"Admin User\",\n        \"email\": \"admin@inventory.test\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2026-07-02T15:12:22.000000Z\",\n        \"updated_at\": \"2026-07-02T15:12:22.000000Z\",\n        \"role\": {\n            \"id\": 1,\n            \"name\": \"admin\",\n            \"created_at\": \"2026-07-02T15:12:21.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:21.000000Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login as Staff",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login request succeeded (200 OK or 204 No Content)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "console.log('Logged in successfully as Staff.');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{staff_email}}",
+                  "description": "Email akun Staff (staff@inventory.test)",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Melakukan otentikasi login sebagai **Staff** (operator harian untuk manajemen stok, kategori, dan transaksi peminjaman/return)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "email",
+                      "value": "{{staff_email}}",
+                      "description": "Email akun Staff (staff@inventory.test)",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "{{password}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:18:57 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IkRlQW1DRVdzaFZrK3hQSEljM284NGc9PSIsInZhbHVlIjoiVkVocHJkU0ovaHBUWGVES3VmeWh0emxqMkJQSUZKNTVRQ29KcERFRjlyREtqNVZObGRCVllVZjl4MWVFZnBvR0dWWFgvKzdFOVF1T0xHV1cvVXp2YlZyOVhqejNjd2FVUnAvZFJkcmRUb0M2V0JEOXpCRXhPU2lDQlZwMklQUUEiLCJtYWMiOiI1YmQxOTVhYzAxYWU4NDQ4MzZkNzc3YzY3NDg1YmVjNGY1NDNjZGNmMTU2N2U5NmZlNTkzYWZkMTRjY2UwZGI0IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:18:57 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6Imd5b3FJOVdxRVNrWHNEUUZGVDhXZGc9PSIsInZhbHVlIjoiSlA0TGdaQzFPYjZQZ25lL2U3aFVOVW9LM2twdHNGUVlIVENXYW1aZmdHaHpSTXc2bU5vQlo2blQ2RE1KRkw3WHMzS0JxVUZleTZXejd6UGhLZzNXM09SU3I2U0w4YVEyeEpPOTZVbExHT3FoMmJ2UWtTa2UwZ3lhazdFczFsd3IiLCJtYWMiOiI2MzY4YWM5OGYxMDA5NzNlYWE5NDM1NjNkYjQwMTU3NWNlMjgyYzJlYjFkMWNhZWJhYzljZWJkMTc2MDljZWZlIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:18:57 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Login successful\",\n    \"user\": {\n        \"id\": 2,\n        \"role_id\": 2,\n        \"name\": \"Staff User\",\n        \"email\": \"staff@inventory.test\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2026-07-02T15:12:22.000000Z\",\n        \"updated_at\": \"2026-07-02T15:12:22.000000Z\",\n        \"role\": {\n            \"id\": 2,\n            \"name\": \"staff\",\n            \"created_at\": \"2026-07-02T15:12:21.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:21.000000Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login as Manager",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login request succeeded (200 OK or 204 No Content)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "console.log('Logged in successfully as Manager.');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "{{manager_email}}",
+                  "description": "Email akun Manager (manager@inventory.test)",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Melakukan otentikasi login sebagai **Manager** (akses read-only untuk memantau dashboard, laporan peminjaman, dan katalog produk)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "email",
+                      "value": "{{manager_email}}",
+                      "description": "Email akun Manager (manager@inventory.test)",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "{{password}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:19:43 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IkFoK0xOcGJnOVd6aDcrUE9aMWdqbGc9PSIsInZhbHVlIjoiU0M4YTFKMnpwVy9JU0tsVVYwb2JDOEdGMUozMTZuVzBLR0lQRXhjbElaYWtpRzVITDNJT2tDZ2ZzSlpaREpxc3JZdzlnT1hIT0g1WDRBeGRPWGtiRkViOUxJSjc0aWFGYXVoUDJoUVZXVnIxa2tCclpzZ25RVkdrWEFHS25HMzYiLCJtYWMiOiIyYThmMzc5ZWFjY2E0NzRjYmYzMDNkMTM3ZDQ2NzQxYzEwOGRhZDQ3ZWFmY2NkZDM3YjliZWI1OWFiODRkNzE4IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:19:43 GMT; Max-Age=7199; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6Ilo2b3dzQnZuQ29CbEVoKzFlQnowcEE9PSIsInZhbHVlIjoibDJqWVJrSWYwazh2cWw3cmxCK29iRUFJQkV5bXdUOElORWUzcTA3OVc5eUZuTGZFZ2xwWlFEbzhvUjJqeHVrMnh3clZTOHpURnZkNnZ1YXJ3WW00MmVKYWZEOWszMnJDc2oyS1VVSkhwRUZQSmREUVN5OW5ram44RnE4Q0Rkc0MiLCJtYWMiOiIxMjM4NDYyYzk0YjViZmUwODU4Y2IwNTFhODdiYjJjMjZmNDM4OWExYTY1ZmUxYTMxMDZiNzYyZjdiODAzNGEzIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:19:43 GMT; Max-Age=7199; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Login successful\",\n    \"user\": {\n        \"id\": 3,\n        \"role_id\": 3,\n        \"name\": \"Manager User\",\n        \"email\": \"manager@inventory.test\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n        \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n        \"role\": {\n            \"id\": 3,\n            \"name\": \"manager\",\n            \"created_at\": \"2026-07-02T15:12:21.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:21.000000Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register New User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "New Staff Member",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "newstaff_{{$timestamp}}@inventory.test",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "password_confirmation",
+                  "value": "password",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "Pendaftaran akun baru secara publik. Secara default diatur akan menerima role `staff`."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "name",
+                      "value": "New Staff Member",
+                      "type": "text"
+                    },
+                    {
+                      "key": "email",
+                      "value": "newstaff_{{$timestamp}}@inventory.test",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "password",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password_confirmation",
+                      "value": "password",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "register"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:20:25 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6Ikhhc05VUkUzVFdwc1lLQlFsckpKTlE9PSIsInZhbHVlIjoiV3o3Tnl3WVZURmdWY3MwR3BqNVYrTUU4d3JlTnh2R3VsRXdLRG1US01lODRGWmdqUWV1clZLZStwZUNRMVJYcEYwVzd4VTdENERJSXd5RGZBSThnQnZNSjA3TDdWNUxlNWdEYi9nV29Dalg5cGhVMlJGbWU1ZjVWaFQwRlU1VFkiLCJtYWMiOiJlYThiNDU0YjgyNmUxODBiNGJjZjYyNGI2YjA1MjNmYzkzYTNlNjNkOGZmOTNhOThiYzZkMjUwYjEzM2YyYWI4IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:20:25 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6IjgxSVRHZUlvY25aYWVkQ2s2bWNvL3c9PSIsInZhbHVlIjoiNG45aHZPak96eDFRazB2ajdZckE5UVVnYlZKMW15emNycDRMMmVVb0g5OE5LOXNxVmlYaUpRT3JFS09HNEw5cTlRODB2dnFLbDJ3LzBLMUxyV2NtSkR1aS9SYVN6T2U1UlNUaitNLzdrSmw1dFB3VmtsVDY0VmtGYWdJRERpbmUiLCJtYWMiOiJkYTVkYWI1ZmFlNDg5NjQyZjAzMjkyMzAxYzU3NDgyMDNmOTViMTY4Y2I4MjQ3MzdiZmJhYWNiM2M3NzRjN2ZkIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:20:25 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Registration successful\",\n    \"user\": {\n        \"role_id\": 2,\n        \"name\": \"New Staff Member\",\n        \"email\": \"newstaff_1783614017@inventory.test\",\n        \"updated_at\": \"2026-07-09T16:20:24.000000Z\",\n        \"created_at\": \"2026-07-09T16:20:24.000000Z\",\n        \"id\": 4,\n        \"role\": {\n            \"id\": 2,\n            \"name\": \"staff\",\n            \"created_at\": \"2026-07-02T15:12:21.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:21.000000Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout succeeded', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            },
+            "description": "Mengakhiri sesi otentikasi user aktif dan menghapus token session pada server."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/logout",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 15:51:28 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6ImJnRjJoOVVkYzFDNEZGMGE2UVNidnc9PSIsInZhbHVlIjoiQ1c1RGllQ1luMTdmOFh4MkJkMlNVakdSS3YzcWswdUxhOE1SSThiTElUVWpaeE1yb2NGbGFsMkV0ZU9qL29OMGprVndpTDZkNW9TUnprNElMN2JLUGtmSXEvNngrWmZCa0RVUDVYVXJvZGlxUnlNd2xyOForaVAycFF4M2dsWVUiLCJtYWMiOiI3NGM0MDM5MjBiOWY4NjNjYjdmM2Y1YTljZGMxY2VkZThiZDIzMGM2ODQ4NDIyOGE2MDIwMDU0MmJmZmFhMDQ1IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 17:51:28 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6ImVEYTYxRzgvZUd4MVJiMzRqL1UvUkE9PSIsInZhbHVlIjoiQ1IvanowMk1JK3hWaVVLQmRDZytDQWtVL3VacS84WGgyQkxJZGNhbk9wMG5HM2tCWUo4bmk2V0JlL1BIelVpNkRZUUFZcEo3WmgxWCtVQkRKYXF2clBHMHd2cGlhQ1h6b1lHUzNxeGhydWdTOGJESkc0OXlOUHpOenlBZmxtUWwiLCJtYWMiOiJkZWI1Y2EwYThiZjM4ZTAwNWYxOWQxY2U4MDdiYmU3MTM4YjlhNGM3MDVhYmQ4M2VkYzllOWQxYjk4NzE5NGIyIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 17:51:28 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Logged out successfully\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Folder untuk otentikasi sesi user, inisialisasi token CSRF, registrasi, dan logout."
+    },
+    {
+      "name": "2. Profile Management",
+      "item": [
+        {
+          "name": "Get Profile View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Mendapatkan halaman atau data konfigurasi profil pengguna."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/profile",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "profile"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:22:00 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IkJUbnhuQ0xCMlFpU01qY3VUbDJaQWc9PSIsInZhbHVlIjoibU9xTTg0T0plK0ZaT0tWS0xrTGk1YUtEbnB6cngxMUgycHhMdkZxVUJzeHczNzRLcUFBS2lFdExMbTQ4Rkk1S2tHNVZFeTlmdWh1SW1PdlVYVlUrWi81Um5TVVZ1TkkycndLT1pVNmkvWWtHL21iSkdTVTl3TEZIL2NHZDVpVUEiLCJtYWMiOiIxYWJmOGQxZDE3NDE0ZTE4YTVkOTJiZTVkOWZiOTQxMDYzY2U2Y2YwMDI5NTMzZDQ4NjUwOGVlZjdjN2QyMDgxIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:22:00 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6InlRcEZncDhHS25oRGJiNUp4SmFQL0E9PSIsInZhbHVlIjoiRDNUcFBiR24zb1JlbzR2SG5VMzdaWnBESkZtcGZqV2c4ZjA1T0ZqN0NhekZxTHBtMnJhUUlGcUw5YTFFNGllMVpmdW1KTGQwaHpEdC9HbWY2N1RiaGg2S2RQTjFTUzBMbkExL2g3aFpjbWFvN1ZFYW9YYlBpalpCeDI2Zkx3d1MiLCJtYWMiOiIxNjZlZjRlMTVkZmZlODQ5MDExNThlMmJmMzBiYWM2NTkwNDYyMmZmNWQ2ODdkZjMwNzk0NjcyOWNlZmZhZmJmIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:22:00 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"user\": {\n        \"id\": 1,\n        \"role_id\": 1,\n        \"name\": \"Admin User\",\n        \"email\": \"admin@inventory.test\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2026-07-02T15:12:22.000000Z\",\n        \"updated_at\": \"2026-07-02T15:12:22.000000Z\",\n        \"role\": {\n            \"id\": 1,\n            \"name\": \"admin\",\n            \"created_at\": \"2026-07-02T15:12:21.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:21.000000Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile Information",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Admin User Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{admin_email}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Memperbarui nama atau email akun user."
+          },
+          "response": []
+        }
+      ],
+      "description": "Folder untuk pengelolaan profil akun yang sedang aktif."
+    },
+    {
+      "name": "3. Dashboard (Analytics & KPIs)",
+      "item": [
+        {
+          "name": "Get Dashboard KPI & Chart Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Dashboard schema returns aggregated KPIs and chart data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('totalProducts');",
+                  "    pm.expect(jsonData).to.have.property('availableProducts');",
+                  "    pm.expect(jsonData).to.have.property('borrowedCount');",
+                  "    pm.expect(jsonData).to.have.property('activeBorrowings');",
+                  "    pm.expect(jsonData).to.have.property('chartData');",
+                  "    pm.expect(jsonData.chartData).to.be.an('array').with.lengthOf(12);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "dashboard"
+              ]
+            },
+            "description": "Mendapatkan data statistik metrik inventaris (total produk, stok tersedia, barang dipinjam, transaksi aktif) dan data chart 12 bulan. Hanya dapat diakses oleh **Admin** dan **Manager**."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/dashboard",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "dashboard"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:10:17 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IjZ0WGkrREVuWlRDRTltc25IZE0zd3c9PSIsInZhbHVlIjoiVG00aHR5WjJnaE9yMzVwUkJ6UWQ2aFBjZ2dVQWpJOEY0ZFB4SnZUdkhVb0k1UUdhK0pYWW1ObHN4S2NaYWR0MlJUTlIyUzk4UlRpZ2tpUWk1aFZ4N3pyQnNPVlJoMmc4VmJ3SXV4T0FvdUx2R0gzeXNEUGxsbGIvaGdnQ3hqRGUiLCJtYWMiOiI1YjVkN2I0MmY0YmUwMjZmMzViYjVhNDQwMjRmZjFhZTJiNzJjZWY3MzhjYzYzOGNiOWM2OTVlNTY3MGQ5NTUxIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:10:17 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6Ii9DbmhTaW1BSDRIcHo3SWQ3YmJ2dkE9PSIsInZhbHVlIjoidmltZW5vVEpPc1NHSFRKNTNZdURubmZ4T1QrMUxxV0FuY2praEdvTWpGTFJJYStkR0xmUkdETXIydkRON0loQjMyanJuT2hUTnluRWFQK0hlY0Q0NFZXU2N4bU84cFl4MWFOV3pHSlBnTkdzcFdhWWtGOE5vbUVJN205V3pEdkQiLCJtYWMiOiI1NzdiNGFmOTVjYzczYTVmZDA5NDQ5MDBhMDk4ZGYzYWY1NzAzMzQ4NjE1OGUzOTU1ZjlkNWZjM2VlNjdkZDNjIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:10:17 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"totalProducts\": 12,\n    \"availableProducts\": 11,\n    \"borrowedCount\": 0,\n    \"activeBorrowings\": 0,\n    \"chartData\": [\n        0,\n        0,\n        0,\n        0,\n        0,\n        0,\n        0,\n        0,\n        0,\n        0,\n        0,\n        0\n    ]\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Folder untuk mengambil ringkasan statistik dan data grafik pada dashboard."
+    },
+    {
+      "name": "4. Categories (Inventory Classification)",
+      "item": [
+        {
+          "name": "List Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is paginated with data array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories?search=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Kata kunci pencarian berdasarkan nama atau deskripsi kategori"
+                }
+              ]
+            },
+            "description": "Mendapatkan daftar kategori inventaris beserta jumlah produk terkait, mendukung pencarian dan paginasi."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/categories?search=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Kata kunci pencarian berdasarkan nama atau deskripsi kategori"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:00:33 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IlRmMVpVSGFabXB0NUJKc2ZqWk1JUFE9PSIsInZhbHVlIjoiSklOSC9QTmdEZXpDU21paDJpQTRhY0xBdlZjcHpyN3grZVViQU1RaElqMFZoVjBIWDJlL1FBZkFlMnFXd3N1R2p4VFVOa09DMnlXQnJneUx5bHAvVklXdGlPME14Y1hYeE05a3ozQnpQOW9WdVMxQkY2ZXZDK0Y3c0tIWEpiRGwiLCJtYWMiOiI3NzVjYTcwNWZlOWU2ODIxOWM2ZThhMjhhZTU2MzliOTc1NzVhZmE3ZTRlMjVkOWU3MDQ1NzBlZDk4M2U5Mzg3IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:00:33 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6ImljSEhRVUlWMTVHeWU0YUR5bjRXSlE9PSIsInZhbHVlIjoiVXZ6S2lKby9DVGZ1SERvbXBBM3R6WGZCVGRUQzlENnV5TDI2MWlNVGhibHI5NVJxTXNESzgvVnhYK0xoRmhHNXdGSWtwRDdqVUZacEVTeGJpNE45dHFKWUVVODByMlhiaEN4L1M2V0FOTGUwaXZrdWZYOXJwSXgrRUtNZ3NxMGkiLCJtYWMiOiJjOWNlMmQ3Y2VkODlmMDRiNjg4NmRmYjVmMjcyNGQ1NTNiNmI2ZTAzNWQ5NzIxMzgwMDI3MTY0YTZlMTI2MmEyIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:00:33 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"current_page\": 1,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"Electronics\",\n            \"description\": \"Electronic devices and components\",\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"products_count\": 5\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Furniture\",\n            \"description\": \"Office and workspace furniture\",\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"products_count\": 2\n        },\n        {\n            \"id\": 4,\n            \"name\": \"Networking\",\n            \"description\": \"Cables, switches, routers, and networking equipment\",\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"products_count\": 2\n        },\n        {\n            \"id\": 3,\n            \"name\": \"Stationery\",\n            \"description\": \"Paper, pens, and office supplies\",\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"products_count\": 2\n        },\n        {\n            \"id\": 5,\n            \"name\": \"Tools\",\n            \"description\": \"Hand tools and power tools\",\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"products_count\": 1\n        }\n    ],\n    \"first_page_url\": \"http://localhost:8000/categories?page=1\",\n    \"from\": 1,\n    \"last_page\": 1,\n    \"last_page_url\": \"http://localhost:8000/categories?page=1\",\n    \"links\": [\n        {\n            \"url\": null,\n            \"label\": \"&laquo; Previous\",\n            \"page\": null,\n            \"active\": false\n        },\n        {\n            \"url\": \"http://localhost:8000/categories?page=1\",\n            \"label\": \"1\",\n            \"page\": 1,\n            \"active\": true\n        },\n        {\n            \"url\": null,\n            \"label\": \"Next &raquo;\",\n            \"page\": null,\n            \"active\": false\n        }\n    ],\n    \"next_page_url\": null,\n    \"path\": \"http://localhost:8000/categories\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 5,\n    \"total\": 5\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Category created or validated (200, 201, or 302)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 302]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Office Supplies {{$timestamp}}",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Stationery, papers, pens, and desk accessories for office staff.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "Membuat kategori baru. Hanya dapat dilakukan oleh **Admin** & **Staff**."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "Office Supplies & Stationery",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Comprehensive stationery and office accessories.",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/{{test_category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "{{test_category_id}}"
+              ]
+            },
+            "description": "Memperbarui nama atau deskripsi kategori inventaris."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories/{{test_category_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories",
+                "{{test_category_id}}"
+              ]
+            },
+            "description": "Menghapus kategori. **Peringatan:** Akan ditolak (400 Bad Request / Restricted) jika kategori masih digunakan oleh produk inventaris."
+          },
+          "response": []
+        }
+      ],
+      "description": "Folder untuk operasi CRUD kategori produk barang."
+    },
+    {
+      "name": "5. Products (Inventory Catalog)",
+      "item": [
+        {
+          "name": "List Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products?search=&category=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Cari berdasarkan SKU Code, Nama Barang, atau Lokasi Rak"
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Filter berdasarkan ID Kategori"
+                }
+              ]
+            },
+            "description": "Mendapatkan daftar produk inventaris, status ketersediaan (available/low/out of stock), dan gambar."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products?search=&category=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Cari berdasarkan SKU Code, Nama Barang, atau Lokasi Rak"
+                    },
+                    {
+                      "key": "category",
+                      "value": "",
+                      "description": "Filter berdasarkan ID Kategori"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:01:03 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IlpJVlh6RkRxL1dUem9mRHRreEhDbXc9PSIsInZhbHVlIjoiU1Y2QjFtRzd2akdsbHZjZzl3SW4rUXB2TDNxUWRURm81QmZjaVVQbkxJS3orNjN5YUtsM0FHYUNWcUpXajlmWmI5T3dwbE9MbXVYSllTY0RBOGgyUzE4STliR2NZVXkzKy9KQkUxUkY2Smt0TVBvdG5KM2JPNmRRYTNmTW1GbUsiLCJtYWMiOiIzZjViNDQ1ZjUwYTE2ZTc3MGIyNWFlMTQyMTBhYjMwZGRiYmYyOWM0ZmM0Zjk1YWI4NDZkNjMwODg4MmYzYmEyIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:01:03 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6InlZQUF2czBhTTZmejRpZFZuT3BrTmc9PSIsInZhbHVlIjoiWmtsbXBoRExLSFcvVllGa1pDMFpSZWNQODU5TktUYzZlS0JBUGNVdHR1S1BabzBsSi91bzZEYlRaTkRIMm9KR2xabzV4dlRuTEF0ekYzK2FzT3czWDFaeWhGcVh2NXVoZ2lkNUdzaUIyODIzaXRhYUlHMEs1L2dhQ2NWOVk5bGkiLCJtYWMiOiI1NzhhYzNhODc1ZTU1ZWE3YTA2ODg0MzViYjg3OGEzZjEzMDlhYzgwNWQxMWQ0NjY5MmQxNTQ3Njg0MjI4ZTk0IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:01:03 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"current_page\": 1,\n    \"data\": [\n        {\n            \"id\": 9,\n            \"category_id\": 3,\n            \"code\": \"PRD-0009\",\n            \"name\": \"A4 Paper Ream (500 sheets)\",\n            \"stock\": 100,\n            \"location\": \"Storage C1\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 3,\n                \"name\": \"Stationery\",\n                \"description\": \"Paper, pens, and office supplies\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 10,\n            \"category_id\": 4,\n            \"code\": \"PRD-0010\",\n            \"name\": \"Cat6 Ethernet Cable 10m\",\n            \"stock\": 30,\n            \"location\": \"Storage D1\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 4,\n                \"name\": \"Networking\",\n                \"description\": \"Cables, switches, routers, and networking equipment\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 11,\n            \"category_id\": 4,\n            \"code\": \"PRD-0011\",\n            \"name\": \"Cisco 8-Port Switch\",\n            \"stock\": 4,\n            \"location\": \"Storage D2\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 4,\n                \"name\": \"Networking\",\n                \"description\": \"Cables, switches, routers, and networking equipment\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 1,\n            \"category_id\": 1,\n            \"code\": \"PRD-0001\",\n            \"name\": \"Laptop Dell Latitude\",\n            \"stock\": 10,\n            \"location\": \"Storage A1\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 1,\n                \"name\": \"Electronics\",\n                \"description\": \"Electronic devices and components\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 4,\n            \"category_id\": 1,\n            \"code\": \"PRD-0004\",\n            \"name\": \"Mechanical Keyboard\",\n            \"stock\": 15,\n            \"location\": \"Storage A3\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 1,\n                \"name\": \"Electronics\",\n                \"description\": \"Electronic devices and components\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 2,\n            \"category_id\": 1,\n            \"code\": \"PRD-0002\",\n            \"name\": \"Monitor LG 24\\\"\",\n            \"stock\": 8,\n            \"location\": \"Storage A2\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 1,\n                \"name\": \"Electronics\",\n                \"description\": \"Electronic devices and components\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 6,\n            \"category_id\": 2,\n            \"code\": \"PRD-0006\",\n            \"name\": \"Office Chair Ergonomic\",\n            \"stock\": 5,\n            \"location\": \"Warehouse B1\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 2,\n                \"name\": \"Furniture\",\n                \"description\": \"Office and workspace furniture\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 12,\n            \"category_id\": 5,\n            \"code\": \"PRD-0012\",\n            \"name\": \"Screwdriver Set (12 pcs)\",\n            \"stock\": 7,\n            \"location\": \"Storage E1\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 5,\n                \"name\": \"Tools\",\n                \"description\": \"Hand tools and power tools\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 7,\n            \"category_id\": 2,\n            \"code\": \"PRD-0007\",\n            \"name\": \"Standing Desk 160cm\",\n            \"stock\": 3,\n            \"location\": \"Warehouse B2\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 2,\n                \"name\": \"Furniture\",\n                \"description\": \"Office and workspace furniture\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        },\n        {\n            \"id\": 5,\n            \"category_id\": 1,\n            \"code\": \"PRD-0005\",\n            \"name\": \"Webcam Logitech C920\",\n            \"stock\": 0,\n            \"location\": \"Storage A4\",\n            \"condition\": \"damaged\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"category\": {\n                \"id\": 1,\n                \"name\": \"Electronics\",\n                \"description\": \"Electronic devices and components\",\n                \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n            }\n        }\n    ],\n    \"first_page_url\": \"http://localhost:8000/products?page=1\",\n    \"from\": 1,\n    \"last_page\": 2,\n    \"last_page_url\": \"http://localhost:8000/products?page=2\",\n    \"links\": [\n        {\n            \"url\": null,\n            \"label\": \"&laquo; Previous\",\n            \"page\": null,\n            \"active\": false\n        },\n        {\n            \"url\": \"http://localhost:8000/products?page=1\",\n            \"label\": \"1\",\n            \"page\": 1,\n            \"active\": true\n        },\n        {\n            \"url\": \"http://localhost:8000/products?page=2\",\n            \"label\": \"2\",\n            \"page\": 2,\n            \"active\": false\n        },\n        {\n            \"url\": \"http://localhost:8000/products?page=2\",\n            \"label\": \"Next &raquo;\",\n            \"page\": 2,\n            \"active\": false\n        }\n    ],\n    \"next_page_url\": \"http://localhost:8000/products?page=2\",\n    \"path\": \"http://localhost:8000/products\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 10,\n    \"total\": 12\n}"
+            }
+          ]
+        },
+        {
+          "name": "Show Product Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{test_product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{test_product_id}}"
+              ]
+            },
+            "description": "Mendapatkan rincian data produk tunggal beserta daftar peminjaman aktif yang sedang meminjam barang ini."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/products/{{test_product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "{{test_product_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:01:45 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IjVUNFlzL1E0cHA0cUVCZVpCQXRSWEE9PSIsInZhbHVlIjoiRXpVYWVKZGFxM1dxZTNLcCtwaDM4bWVaMGtmZEQ3UXNEK0tyMnFiT0tUeHlRWnlWNkQ5Z3ZndHRLUnUvWFFtS3UwMk40YnlvZVlpUUJrTjk2VncyVVU4WitlWmNsRy8rVjZpUk5XUVh4YzFMTFdid3BkUjJyQU8zMENTY3J2T3QiLCJtYWMiOiJkYmU1MzAzZTQxODJiYzI1YjAwZjk1YzUyZTE5NmU0ZmUyOGRlYTI0YWQzNTcwZTNhYmY2M2JiNDc5OWY3YTAzIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:01:45 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6IkZUVG5LdWhsL1FSZnFOaG1reUJ1c2c9PSIsInZhbHVlIjoiMGd4alMyZVl1MzdRbGU0c3JDaHVGNVpzM29kUVNlUlJDUXUwWXN0U3hYUDFpTUkyRjVjQ0V2NlBnV1RjS1pabU9ObzdOQ2ZHdFZCZFpuTEhHall3UFRsMEwvYTYxY3BDOWZPamJmdmpYclAxMTBxMWxlbHpURHh3MjNydFlRcVciLCJtYWMiOiI2MzFmYjhkN2IwYjk0ZDljZWMwODM4MWJjZDkxODViYWQ3ZmUwMmQzNjAyYWNkNmYyYTdlYmFkNGEzMWYyMjc5IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:01:45 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"product\": {\n        \"id\": 1,\n        \"category_id\": 1,\n        \"code\": \"PRD-0001\",\n        \"name\": \"Laptop Dell Latitude\",\n        \"stock\": 10,\n        \"location\": \"Storage A1\",\n        \"condition\": \"good\",\n        \"image\": null,\n        \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n        \"updated_at\": \"2026-07-02T15:12:23.000000Z\",\n        \"category\": {\n            \"id\": 1,\n            \"name\": \"Electronics\",\n            \"description\": \"Electronic devices and components\",\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n        },\n        \"borrowing_details\": []\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Product (Multipart Form-Data)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "code",
+                  "value": "PRD-{{$timestamp}}",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "MacBook Air M3 15-inch",
+                  "type": "text"
+                },
+                {
+                  "key": "category_id",
+                  "value": "{{test_category_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "15",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Lemari Penyimpanan B-04",
+                  "type": "text"
+                },
+                {
+                  "key": "condition",
+                  "value": "good",
+                  "description": "Pilihan kondisi: good, damaged, lost",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "description": "Upload foto produk (Opsional, max 2MB)",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "Membuat produk baru. Mendukung pengiriman berkas gambar (Multipart form-data). Hanya untuk **Admin** & **Staff**."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product (Method Spoofing PUT)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "_method",
+                  "value": "PUT",
+                  "description": "Wajib untuk spoofing PUT di Laravel pada request multipart",
+                  "type": "text"
+                },
+                {
+                  "key": "code",
+                  "value": "PRD-0001",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "MacBook Pro M3 Max (Updated)",
+                  "type": "text"
+                },
+                {
+                  "key": "category_id",
+                  "value": "{{test_category_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "12",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Lemari Penyimpanan A-01",
+                  "type": "text"
+                },
+                {
+                  "key": "condition",
+                  "value": "good",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "description": "Upload foto baru jika ingin mengganti gambar lama",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/products/{{test_product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{test_product_id}}"
+              ]
+            },
+            "description": "Memperbarui data produk. **Catatan Penting:** Menggunakan HTTP POST dengan field `_method=PUT` agar PHP dan Laravel dapat memproses upload file pada operasi pembaruan data."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{test_product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{test_product_id}}"
+              ]
+            },
+            "description": "Menghapus produk dari inventaris. Akan ditolak jika produk sedang dalam status dipinjam (memiliki transaksi peminjaman aktif)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Folder untuk pengelolaan barang inventaris (CRUD), filter kategori, dan upload gambar."
+    },
+    {
+      "name": "6. Borrowings & Returns (Transactions)",
+      "item": [
+        {
+          "name": "List Borrowing History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/borrowings?search=&status=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "borrowings"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Cari berdasarkan Nama Peminjam"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter status: 'borrowed' (sedang dipinjam) atau 'returned' (selesai/dikembalikan)"
+                }
+              ]
+            },
+            "description": "Mendapatkan riwayat transaksi peminjaman beserta rincian item barang dan statusnya."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/borrowings?search=&status=",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "borrowings"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Cari berdasarkan Nama Peminjam"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "description": "Filter status: 'borrowed' (sedang dipinjam) atau 'returned' (selesai/dikembalikan)"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:16:55 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IkNFNUhZZjJtR1NCWUR3bkZtWnRkMlE9PSIsInZhbHVlIjoiZ3E0MGJGd1d4QjhqanRPdkRuaUxGakRQajgwVDFuRXRnSzJOa05Eemh2SmlicXF5eDNDbWJvVU03RWpLVklQdWRPWGV5bnJ3Zlp1SThFazRtL2hxdTJ3Zkh2MHZZbnJXNDYyR1Z1cmtLdnFGQzNFTHdwcnl1b3NxYUc0Z09vazYiLCJtYWMiOiIwODViMDM2ZGJhMjQ2MmJjNzcwNTViZWQ3MWMwMThhZjg5ZDY1ODllYTRiZjRjZGFkMDI5MTY5ZjljZjU0OTA1IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:16:55 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6Im5JV3RpWTgyczNqdGN1ZHZySUF6N2c9PSIsInZhbHVlIjoiWGhqaU9sMDhiN0FSQkZyOGVEM0FlazU5S2JicjJISzEzSDJLS0tWcjVWRWxPK0NCR2k3aGRGZHNXWFRkeXh6TDBFeTJLcnBJRmk1RlpuMWsvTklRU1prSW93ZWZVa2l2ZWZxU1V5OXhJQVhrbGVGejF2QTdveFV2VWNkaU1YNWEiLCJtYWMiOiIyZjBlNGU2NDA3YzExNmUyMGEwM2Y4ZWUyN2MyNGVlYjc2NDBhZjE2NmZlNzdmMTUwMTBmNjEzMzM1OTAxZGQyIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:16:55 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"current_page\": 1,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"user_id\": 1,\n            \"borrower_name\": \"Selia Sari\",\n            \"borrow_date\": \"2026-07-08T00:00:00.000000Z\",\n            \"return_date\": null,\n            \"status\": \"borrowed\",\n            \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n            \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n            \"user\": {\n                \"id\": 1,\n                \"role_id\": 1,\n                \"name\": \"Admin User\",\n                \"email\": \"admin@inventory.test\",\n                \"email_verified_at\": null,\n                \"created_at\": \"2026-07-02T15:12:22.000000Z\",\n                \"updated_at\": \"2026-07-02T15:12:22.000000Z\"\n            },\n            \"details\": [\n                {\n                    \"id\": 1,\n                    \"borrowing_id\": 1,\n                    \"product_id\": 1,\n                    \"quantity\": 1,\n                    \"condition_before\": \"good\",\n                    \"condition_after\": null,\n                    \"returned_at\": null,\n                    \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n                    \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n                    \"product\": {\n                        \"id\": 1,\n                        \"category_id\": 1,\n                        \"code\": \"PRD-0001\",\n                        \"name\": \"Laptop Dell Latitude\",\n                        \"stock\": 9,\n                        \"location\": \"Storage A1\",\n                        \"condition\": \"good\",\n                        \"image\": null,\n                        \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                        \"updated_at\": \"2026-07-09T16:15:56.000000Z\"\n                    }\n                }\n            ]\n        }\n    ],\n    \"first_page_url\": \"http://localhost:8000/borrowings?page=1\",\n    \"from\": 1,\n    \"last_page\": 1,\n    \"last_page_url\": \"http://localhost:8000/borrowings?page=1\",\n    \"links\": [\n        {\n            \"url\": null,\n            \"label\": \"&laquo; Previous\",\n            \"page\": null,\n            \"active\": false\n        },\n        {\n            \"url\": \"http://localhost:8000/borrowings?page=1\",\n            \"label\": \"1\",\n            \"page\": 1,\n            \"active\": true\n        },\n        {\n            \"url\": null,\n            \"label\": \"Next &raquo;\",\n            \"page\": null,\n            \"active\": false\n        }\n    ],\n    \"next_page_url\": null,\n    \"path\": \"http://localhost:8000/borrowings\",\n    \"per_page\": 10,\n    \"prev_page_url\": null,\n    \"to\": 1,\n    \"total\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Show Borrowing Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/borrowings/{{test_borrowing_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "borrowings",
+                "{{test_borrowing_id}}"
+              ]
+            },
+            "description": "Mendapatkan rincian transaksi peminjaman beserta seluruh baris detail barang (BorrowingDetails)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/borrowings/{{test_borrowing_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "borrowings",
+                    "{{test_borrowing_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:16:29 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IkF1dDNUN0hIRUlWZytQU3ZaZVlrRkE9PSIsInZhbHVlIjoibkFZckx6ZVZJcnZua0dFVG9wMEE4SzhPRVNJTzZLcGFFc3RGalhOVno1dXU4M1VJZ3ZuNzVDQTlYN0VGSDZKNEYxYkhXd1FmVTVjV3AyRE83a0hvYWRXcmUwclJ3dDRFTWt3aGt1SzFrNmU1TTJIYzFwL0Z0am5QMm5aK1EvV1ciLCJtYWMiOiIxYWZhNzI3ZjVlNzZjZDFlNjIzMjNlZGVkNzI4ZGI5ZGIyYWVlZWYxMTE5ZGIxNTA0YWRmM2FjMjQzMTAzN2E4IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:16:29 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6IjByaHFpQm9Gbkd4NUt1S2hqTkZuSEE9PSIsInZhbHVlIjoiTm0vanJOSnZxd3E1ZHpGcStOb1VsQ0hkMGJDN2VlMkFVVGtIYm9DZXEyUTdpTmN6ZXpUbnEzR0orMWJBTUxsd3NVTVNMVTQxTkZGNmlCSkoxKzB4NElQbGY0TThlWW1ad1lXWEtiZ2FkcjRJTlMvSVBDZDVwcUNsLzRtdmovREIiLCJtYWMiOiJiZGVjNzdkNzMyOTJjNjViMjU4ZGYzN2I0OWJlZGQ3MmRmNjY5NzI0MTRmN2M4NDM0MjMxNGExNjZhODg3NDllIiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:16:29 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"borrowing\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"borrower_name\": \"Selia Sari\",\n        \"borrow_date\": \"2026-07-08T00:00:00.000000Z\",\n        \"return_date\": null,\n        \"status\": \"borrowed\",\n        \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n        \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n        \"user\": {\n            \"id\": 1,\n            \"role_id\": 1,\n            \"name\": \"Admin User\",\n            \"email\": \"admin@inventory.test\",\n            \"email_verified_at\": null,\n            \"created_at\": \"2026-07-02T15:12:22.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:22.000000Z\"\n        },\n        \"details\": [\n            {\n                \"id\": 1,\n                \"borrowing_id\": 1,\n                \"product_id\": 1,\n                \"quantity\": 1,\n                \"condition_before\": \"good\",\n                \"condition_after\": null,\n                \"returned_at\": null,\n                \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n                \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n                \"product\": {\n                    \"id\": 1,\n                    \"category_id\": 1,\n                    \"code\": \"PRD-0001\",\n                    \"name\": \"Laptop Dell Latitude\",\n                    \"stock\": 9,\n                    \"location\": \"Storage A1\",\n                    \"condition\": \"good\",\n                    \"image\": null,\n                    \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                    \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n                    \"category\": {\n                        \"id\": 1,\n                        \"name\": \"Electronics\",\n                        \"description\": \"Electronic devices and components\",\n                        \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                        \"updated_at\": \"2026-07-02T15:12:23.000000Z\"\n                    }\n                }\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Borrowing Transaction",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Borrowing transaction created (200, 201, or 302)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 302]);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"borrower_name\": \"Selia Sari\",\n    \"borrow_date\": \"2026-07-08\",\n    \"items\": [\n        {\n            \"product_id\": {{test_product_id}},\n            \"quantity\": 1\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/borrowings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "borrowings"
+              ]
+            },
+            "description": "Membuat transaksi peminjaman baru (mendukung multi-item sekaligus). **Keamanan Stok:** Di dalam backend, transaksi dibungkus dalam DB Transaction dan row locking (`lockForUpdate()`) sehingga mengurangi stok barang secara aman dan mencegah over-borrowing jika terjadi request bersamaan."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"borrower_name\": \"Selia Sari\",\n    \"borrow_date\": \"2026-07-08\",\n    \"items\": [\n        {\n            \"product_id\": {{test_product_id}},\n            \"quantity\": 1\n        }\n    ]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/borrowings",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "borrowings"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:15:57 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IlpaMFl6ajVIb0RsdmdPTWZLVlIzeUE9PSIsInZhbHVlIjoiNkhyUkhFQ2hraUx0aGxGcG9iU0ppQjE0ZGVmUnJpb3d4eHNrUm9ZNEQ5TGhsNDBhWjFXYTlJb1hNM0NvbXlzTGthOCsrSFpNWUc2QTVVSVRrZG1hYUlhNHlSa2tYRk1OQXRiQkxmVGtpRHVENTkrbytGckdjZmpPRHNRbjJpU3EiLCJtYWMiOiJiYmUxY2FiODQyMmM4ZmQ4MDQ5ZDU4ZGJlZTcwMDBhYjY5ODA3OTUzZDRjNDgzMWNhOGQ4NGUxZTc3ODBiNmU4IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:15:57 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6ImVDeE51RU0vS2g5Vjh0R3NFdUE4b1E9PSIsInZhbHVlIjoiNm5DMVVLYkNDZk9UK0c2bUtFVEU0c0FvUjRkS3FaMSswR1VaU09neXRGNGcwM2UzMnJScUJmTDNiS1V2aTR3OUd3NGhRS1d3NGJFYkhQeHRQSGlNZVF5bTg2Mzl2bjJjMndWMWhoUVZjZjdJQ1hRYzRVWkVkc2JvbnVqV1lnREsiLCJtYWMiOiIwMjA2NTIxMzdlYTY3ZGY3NzIyZDBhZDMwMDNlZGUwZTRiNDZjNTZiZTIwNzllNTBjNjMxYzEzNzA2YTJlMzg0IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:15:57 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Borrowing transaction created successfully.\",\n    \"borrowing\": {\n        \"user_id\": 1,\n        \"borrower_name\": \"Selia Sari\",\n        \"borrow_date\": \"2026-07-08T00:00:00.000000Z\",\n        \"return_date\": null,\n        \"status\": \"borrowed\",\n        \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n        \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n        \"id\": 1,\n        \"user\": {\n            \"id\": 1,\n            \"role_id\": 1,\n            \"name\": \"Admin User\",\n            \"email\": \"admin@inventory.test\",\n            \"email_verified_at\": null,\n            \"created_at\": \"2026-07-02T15:12:22.000000Z\",\n            \"updated_at\": \"2026-07-02T15:12:22.000000Z\"\n        },\n        \"details\": [\n            {\n                \"id\": 1,\n                \"borrowing_id\": 1,\n                \"product_id\": 1,\n                \"quantity\": 1,\n                \"condition_before\": \"good\",\n                \"condition_after\": null,\n                \"returned_at\": null,\n                \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n                \"updated_at\": \"2026-07-09T16:15:56.000000Z\",\n                \"product\": {\n                    \"id\": 1,\n                    \"category_id\": 1,\n                    \"code\": \"PRD-0001\",\n                    \"name\": \"Laptop Dell Latitude\",\n                    \"stock\": 9,\n                    \"location\": \"Storage A1\",\n                    \"condition\": \"good\",\n                    \"image\": null,\n                    \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n                    \"updated_at\": \"2026-07-09T16:15:56.000000Z\"\n                }\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Return Borrowed Item (Partial Return)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+                  "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+                  "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+                  "    if (token) {",
+                  "        pm.request.headers.add({",
+                  "            key: 'X-XSRF-TOKEN',",
+                  "            value: decodeURIComponent(token)",
+                  "        });",
+                  "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+                  "    } else {",
+                  "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+                  "    }",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Return processed successfully (200, 201, or 302)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 302]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Requested-With",
+                "value": "XMLHttpRequest",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"returned_date\": \"2026-07-09\",\n    \"condition_after\": \"good\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/borrowings/{{test_borrowing_id}}/return/{{test_detail_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "borrowings",
+                "{{test_borrowing_id}}",
+                "return",
+                "{{test_detail_id}}"
+              ]
+            },
+            "description": "Memproses pengembalian barang per-baris item (partial return). Akan memperbarui status baris barang menjadi dikembalikan, mengembalikan jumlah stok produk ke inventaris, dan mencatat kondisi barang setelah dikembalikan."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "X-Requested-With",
+                    "value": "XMLHttpRequest",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"returned_date\": \"2026-07-09\",\n    \"condition_after\": \"good\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/borrowings/{{test_borrowing_id}}/return/{{test_detail_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "borrowings",
+                    "{{test_borrowing_id}}",
+                    "return",
+                    "{{test_detail_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.30.3"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.3.31"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 09 Jul 2026 16:17:35 GMT"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "XSRF-TOKEN=eyJpdiI6IjBJMUdNZ28rR1ZBWVRma0V3WDFTcGc9PSIsInZhbHVlIjoiQTFBekwyMzB5a0d3aS9rV3JqU3RFZEtYa2s5RVlFbDNHOXFQZk1VVHJVSThNbzNmUjNmL0tyeVBmalNaa1pqSXZma0JyTTJrVk5PV1BQNk1iUTJiWi9Jc2tpWTJQRGNkZWZqM3F5OFRIQmY4U2JGbVpISjgzeDZCLzNsaEFCTDgiLCJtYWMiOiIzMmYyNmJjNzgwZDE3ZTU4ZjBkMjAxMTdiYmNhY2RhY2E1NmIwYWFkYzlhZjYxZjZhZDVmMTU1YzJjZWYzMTU2IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:17:35 GMT; Max-Age=7200; path=/; samesite=lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "inventory-management-session=eyJpdiI6ImIzWjRqQkpkc2c1bUVXQ0FEY1JIZEE9PSIsInZhbHVlIjoiSGNuTXk0V0kxOVdheTFnUVVHb3UxL0N0MnYzQVVreEdRd29FbVdGNEF5dHJBeE13aFF2RWZTME1ETHNjanF5ekJWVXdUeXVEek9qeW1NZ1lxYlR5bW0zdzJveFllZmgvaXdoTDg0aUdXcHFFTGtKcUFLZUVCdDU1VVRscGxYbXkiLCJtYWMiOiIzNjkwZGUyNTFlNzZlMTcyNjEzNTBmOTU1YzA2NTUwMTRjMDc0MDMyY2IwYmI4ODllYWYwMTA4ZTcxMzNhYTI1IiwidGFnIjoiIn0%3D; expires=Thu, 09 Jul 2026 18:17:35 GMT; Max-Age=7200; path=/; httponly; samesite=lax"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Item returned successfully. Stock has been restored.\",\n    \"detail\": {\n        \"id\": 1,\n        \"borrowing_id\": 1,\n        \"product_id\": 1,\n        \"quantity\": 1,\n        \"condition_before\": \"good\",\n        \"condition_after\": \"good\",\n        \"returned_at\": \"2026-07-09T16:17:34.000000Z\",\n        \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n        \"updated_at\": \"2026-07-09T16:17:34.000000Z\",\n        \"product\": {\n            \"id\": 1,\n            \"category_id\": 1,\n            \"code\": \"PRD-0001\",\n            \"name\": \"Laptop Dell Latitude\",\n            \"stock\": 10,\n            \"location\": \"Storage A1\",\n            \"condition\": \"good\",\n            \"image\": null,\n            \"created_at\": \"2026-07-02T15:12:23.000000Z\",\n            \"updated_at\": \"2026-07-09T16:17:34.000000Z\"\n        }\n    },\n    \"borrowing\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"borrower_name\": \"Selia Sari\",\n        \"borrow_date\": \"2026-07-08T00:00:00.000000Z\",\n        \"return_date\": \"2026-07-09T00:00:00.000000Z\",\n        \"status\": \"returned\",\n        \"created_at\": \"2026-07-09T16:15:56.000000Z\",\n        \"updated_at\": \"2026-07-09T16:17:34.000000Z\"\n    }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Folder untuk pencatatan transaksi peminjaman barang dan pengembalian (per-item return) dengan proteksi database concurrency lock."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-inject X-XSRF-TOKEN header from Postman Environment or Cookies for modifying requests in Laravel",
+          "if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(pm.request.method)) {",
+          "    let token = pm.environment.get('xsrf_token') || pm.cookies.get('XSRF-TOKEN');",
+          "    if (token) {",
+          "        pm.request.headers.add({",
+          "            key: 'X-XSRF-TOKEN',",
+          "            value: decodeURIComponent(token)",
+          "        });",
+          "        console.log('Injected X-XSRF-TOKEN header:', decodeURIComponent(token));",
+          "    } else {",
+          "        console.warn('XSRF-TOKEN not found! Please run 1. Auth -> Sanctum CSRF Cookie first.');",
+          "    }",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Automated Global Assertions",
+          "pm.test('Response does not have server 5xx error', function () {",
+          "    pm.response.to.not.be.serverError;",
+          "});",
+          "pm.test('Response time is acceptable (< 3000ms)', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}

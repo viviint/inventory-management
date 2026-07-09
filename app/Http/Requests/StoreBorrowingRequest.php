@@ -11,6 +11,24 @@ class StoreBorrowingRequest extends FormRequest
         return $this->user()->can('create', \App\Models\Borrowing::class);
     }
 
+    protected function prepareForValidation(): void
+    {
+        // Provide sensible defaults for Postman/API simplicity
+        if (!$this->has('borrow_date') || empty($this->borrow_date)) {
+            $this->merge(['borrow_date' => now()->toDateString()]);
+        }
+
+        if ($this->has('items') && is_array($this->items)) {
+            $items = $this->items;
+            foreach ($items as $index => &$item) {
+                if (is_array($item) && empty($item['condition_before'])) {
+                    $item['condition_before'] = $item['condition'] ?? 'good';
+                }
+            }
+            $this->merge(['items' => $items]);
+        }
+    }
+
     public function rules(): array
     {
         return [

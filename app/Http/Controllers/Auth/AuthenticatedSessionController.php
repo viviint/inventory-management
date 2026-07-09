@@ -22,7 +22,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
 
@@ -30,6 +30,13 @@ class AuthenticatedSessionController extends Controller
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
+
+        if ($request->wantsJson() || $request->ajax() || str_contains($request->header('User-Agent', ''), 'Postman')) {
+            return response()->json([
+                'message' => 'Login successful',
+                'user'    => $user->load('role'),
+            ], 200);
+        }
 
         // Staff land on products list; Admin and Manager land on dashboard
         $default = ($user->isAdmin() || $user->isManager())
@@ -42,13 +49,19 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+
+        if ($request->wantsJson() || $request->ajax() || str_contains($request->header('User-Agent', ''), 'Postman')) {
+            return response()->json([
+                'message' => 'Logged out successfully',
+            ], 200);
+        }
 
         return redirect('/');
     }

@@ -14,7 +14,7 @@ class CategoryController extends Controller
     /**
      * Display a paginated listing of categories with optional search.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Category::class);
 
@@ -27,6 +27,10 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json($categories, 200);
+        }
 
         return view('categories.index', compact('categories'));
     }
@@ -44,9 +48,16 @@ class CategoryController extends Controller
     /**
      * Store a newly created category in storage.
      */
-    public function store(StoreCategoryRequest $request): RedirectResponse
+    public function store(StoreCategoryRequest $request)
     {
-        Category::create($request->validated());
+        $category = Category::create($request->validated());
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message'  => 'Category created successfully.',
+                'category' => $category,
+            ], 201);
+        }
 
         return redirect()
             ->route('categories.index')
@@ -66,9 +77,16 @@ class CategoryController extends Controller
     /**
      * Update the specified category in storage.
      */
-    public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
         $category->update($request->validated());
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message'  => 'Category updated successfully.',
+                'category' => $category->fresh(),
+            ], 200);
+        }
 
         return redirect()
             ->route('categories.index')
@@ -79,17 +97,28 @@ class CategoryController extends Controller
      * Remove the specified category from storage.
      * Blocked if the category still has associated products (restrict FK).
      */
-    public function destroy(Category $category): RedirectResponse
+    public function destroy(Request $request, Category $category)
     {
         $this->authorize('delete', $category);
 
         if ($category->products()->exists()) {
+            if ($this->isApiOrPostman($request)) {
+                return response()->json([
+                    'message' => 'Cannot delete a category that has associated products. Reassign or delete the products first.',
+                ], 422);
+            }
             return redirect()
                 ->route('categories.index')
                 ->with('error', 'Cannot delete a category that has associated products. Reassign or delete the products first.');
         }
 
         $category->delete();
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message' => 'Category deleted successfully.',
+            ], 200);
+        }
 
         return redirect()
             ->route('categories.index')

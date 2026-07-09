@@ -61,7 +61,7 @@
 
         <!-- Footer -->
         <footer class="w-full max-w-6xl mx-auto px-6 py-6 text-center text-xs text-slate-400 dark:text-slate-500">
-            <p>© {{ date('Y') }} Vivi's Inventory Management System.</p>
+            <p>© {{ date('Y') }} Vivi's Inlife challenge - Inventory Management System.</p>
         </footer>
     </body>
 </html>

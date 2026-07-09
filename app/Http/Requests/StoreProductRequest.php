@@ -11,6 +11,13 @@ class StoreProductRequest extends FormRequest
         return $this->user()->can('create', \App\Models\Product::class);
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (!$this->has('condition') || empty($this->condition)) {
+            $this->merge(['condition' => 'good']);
+        }
+    }
+
     public function rules(): array
     {
         return [

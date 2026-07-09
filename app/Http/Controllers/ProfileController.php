@@ -14,8 +14,14 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'user' => $request->user()->load('role'),
+            ], 200);
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
@@ -24,7 +30,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
         $request->user()->fill($request->validated());
 
@@ -34,13 +40,20 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message' => 'Profile updated successfully.',
+                'user'    => $request->user()->fresh('role'),
+            ], 200);
+        }
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -54,6 +67,12 @@ class ProfileController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message' => 'User account deleted successfully.',
+            ], 200);
+        }
 
         return Redirect::to('/');
     }

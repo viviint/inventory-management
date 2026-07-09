@@ -29,7 +29,7 @@ class RegisteredUserController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -50,6 +50,13 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        if ($request->wantsJson() || $request->ajax() || str_contains($request->header('User-Agent', ''), 'Postman')) {
+            return response()->json([
+                'message' => 'Registration successful',
+                'user'    => $user->load('role'),
+            ], 201);
+        }
 
         // Staff land on products, Admin/Manager on dashboard
         $redirect = $user->isAdmin() || $user->isManager()

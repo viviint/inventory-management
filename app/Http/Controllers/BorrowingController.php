@@ -16,7 +16,7 @@ class BorrowingController extends Controller
     /**
      * Display a paginated list of all borrowings, filterable by status.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Borrowing::class);
 
@@ -30,6 +30,10 @@ class BorrowingController extends Controller
             ->orderByDesc('borrow_date')
             ->paginate(10)
             ->withQueryString();
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json($borrowings, 200);
+        }
 
         return view('borrowings.index', compact('borrowings'));
     }
@@ -53,11 +57,11 @@ class BorrowingController extends Controller
      * Store a new borrowing transaction.
      * Stock validation and decrement wrapped in a DB transaction.
      */
-    public function store(StoreBorrowingRequest $request): RedirectResponse
+    public function store(StoreBorrowingRequest $request)
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated, $request) {
+        $borrowing = DB::transaction(function () use ($validated, $request) {
             // Create the borrowing header
             $borrowing = Borrowing::create([
                 'user_id'       => $request->user()->id,
@@ -92,7 +96,16 @@ class BorrowingController extends Controller
                     'returned_at'     => null,
                 ]);
             }
+
+            return $borrowing;
         });
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message'   => 'Borrowing transaction created successfully.',
+                'borrowing' => $borrowing->load(['user', 'details.product']),
+            ], 201);
+        }
 
         return redirect()
             ->route('borrowings.index')
@@ -102,11 +115,17 @@ class BorrowingController extends Controller
     /**
      * Display the specified borrowing with all its detail lines.
      */
-    public function show(Borrowing $borrowing): View
+    public function show(Request $request, Borrowing $borrowing)
     {
         $this->authorize('view', $borrowing);
 
         $borrowing->load(['user', 'details.product.category']);
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'borrowing' => $borrowing,
+            ], 200);
+        }
 
         return view('borrowings.show', compact('borrowing'));
     }
@@ -115,7 +134,7 @@ class BorrowingController extends Controller
      * Process the return of a single borrowing detail line.
      * Stock is restored and detail marked as returned inside a DB transaction.
      */
-    public function returnItem(Request $request, Borrowing $borrowing, BorrowingDetail $detail): RedirectResponse
+    public function returnItem(Request $request, Borrowing $borrowing, BorrowingDetail $detail)
     {
         $this->authorize('update', $borrowing);
 
@@ -125,6 +144,11 @@ class BorrowingController extends Controller
         }
 
         if ($detail->isReturned()) {
+            if ($this->isApiOrPostman($request)) {
+                return response()->json([
+                    'message' => 'This item has already been returned.',
+                ], 422);
+            }
             return redirect()
                 ->route('borrowings.show', $borrowing)
                 ->with('error', 'This item has already been returned.');
@@ -152,6 +176,14 @@ class BorrowingController extends Controller
                 ]);
             }
         });
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'message'   => 'Item returned successfully. Stock has been restored.',
+                'detail'    => $detail->fresh('product'),
+                'borrowing' => $borrowing->fresh(),
+            ], 200);
+        }
 
         return redirect()
             ->route('borrowings.show', $borrowing)

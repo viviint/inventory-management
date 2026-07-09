@@ -15,7 +15,7 @@ class DashboardController extends Controller
      * Show the dashboard with summary metrics and monthly chart data.
      * Accessible only by Admin and Manager.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $this->authorize('view-dashboard');
 
@@ -40,6 +40,16 @@ class DashboardController extends Controller
         $chartData = [];
         for ($m = 1; $m <= 12; $m++) {
             $chartData[] = $monthlyData[$m] ?? 0;
+        }
+
+        if ($this->isApiOrPostman($request)) {
+            return response()->json([
+                'totalProducts'     => $totalProducts,
+                'availableProducts' => $availableProducts,
+                'borrowedCount'     => $borrowedCount,
+                'activeBorrowings'  => $activeBorrowings,
+                'chartData'         => $chartData,
+            ], 200);
         }
 
         return view('dashboard', compact(
