@@ -6,7 +6,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#24C4F4]/10 via-[#7C3AED]/10 to-[#EC4899]/10 dark:from-[#24C4F4]/20 dark:via-[#7C3AED]/20 dark:to-[#EC4899]/20 p-6 rounded-lg border border-[#24C4F4]/20 dark:border-[#7C3AED]/30">
             <div>
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                    Welcome back, {{ auth()->user()->name }} 👋
+                    Welcome back, {{ auth()->user()->name }}
                 </h2>
                 <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
                     Here is what is happening across your inventory warehouse today.

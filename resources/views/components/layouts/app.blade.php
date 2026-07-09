@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title . ' — ' : '' }}{{ config('app.name') }}</title>
-    <meta name="description" content="Inventory Management System — enterprise SaaS dashboard to manage products, categories, and borrowings.">
+    <meta name="description" content="Inventory Management System — dashboard to manage products, categories, and borrowings.">
 
     {{-- Plus Jakarta Sans --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
                 </div>
                 <div class="flex flex-col">
                     <span class="text-base font-bold tracking-tight text-slate-900 dark:text-white leading-tight">Inventory MS</span>
-                    <span class="text-[11px] font-medium text-[#7C3AED] dark:text-[#24C4F4] uppercase tracking-wider">Enterprise SaaS</span>
+                  
                 </div>
             </div>
 
@@ -44,7 +44,7 @@
                 @can('view-dashboard')
                 <a href="{{ route('dashboard') }}"
                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm transition-all duration-150
-                          {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-[#24C4F4] via-[#7C3AED] to-[#EC4899] text-white font-semibold shadow-sm shadow-[#7C3AED]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                          {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-[#D55BA9] to-[#F1A84F] text-white font-semibold shadow-sm shadow-[#D55BA9]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
@@ -55,7 +55,7 @@
                 @can('viewAny', App\Models\Product::class)
                 <a href="{{ route('products.index') }}"
                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm transition-all duration-150
-                          {{ request()->routeIs('products.*') ? 'bg-gradient-to-r from-[#24C4F4] via-[#7C3AED] to-[#EC4899] text-white font-semibold shadow-sm shadow-[#7C3AED]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                          {{ request()->routeIs('products.*') ? 'bg-gradient-to-r from-[#D55BA9] to-[#F1A84F] text-white font-semibold shadow-sm shadow-[#D55BA9]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
@@ -66,7 +66,7 @@
                 @can('viewAny', App\Models\Category::class)
                 <a href="{{ route('categories.index') }}"
                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm transition-all duration-150
-                          {{ request()->routeIs('categories.*') ? 'bg-gradient-to-r from-[#24C4F4] via-[#7C3AED] to-[#EC4899] text-white font-semibold shadow-sm shadow-[#7C3AED]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                          {{ request()->routeIs('categories.*') ? 'bg-gradient-to-r from-[#D55BA9] to-[#F1A84F] text-white font-semibold shadow-sm shadow-[#D55BA9]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
                     </svg>
@@ -77,7 +77,7 @@
                 @can('viewAny', App\Models\Borrowing::class)
                 <a href="{{ route('borrowings.index') }}"
                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm transition-all duration-150
-                          {{ request()->routeIs('borrowings.*') ? 'bg-gradient-to-r from-[#24C4F4] via-[#7C3AED] to-[#EC4899] text-white font-semibold shadow-sm shadow-[#7C3AED]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                          {{ request()->routeIs('borrowings.*') ? 'bg-gradient-to-r from-[#D55BA9] to-[#F1A84F] text-white font-semibold shadow-sm shadow-[#D55BA9]/20' : 'font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
@@ -90,7 +90,7 @@
             {{-- User info + logout --}}
             <div class="border-t border-slate-200 dark:border-slate-800 px-4 py-4 bg-slate-50/50 dark:bg-slate-900/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-md bg-gradient-to-tr from-[#7C3AED] to-[#EC4899] flex items-center justify-center text-sm font-bold text-white shadow-sm flex-shrink-0">
+                    <div class="w-9 h-9 rounded-md bg-gradient-to-tr from-[#D55BA9] to-[#F1A84F] flex items-center justify-center text-sm font-bold text-white shadow-sm flex-shrink-0">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                     <div class="flex-1 min-w-0">

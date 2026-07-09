@@ -1,58 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📦 Inventory Management System (IMS)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web **Inventory Management System (IMS)** ini dirancang untuk mendigitalkan pencatatan aset, mencegah data ganda, mempermudah pemantauan stok secara real-time, dan mempercepat pembuatan laporan peminjaman barang. 
 
-## About Laravel
+Aplikasi dibangun menggunakan **Laravel 12**, **MySQL 8**, **Tailwind CSS**, dan **Laravel Breeze** untuk otentikasi & hak akses (RBAC), serta menggunakan visualisasi data dinamis dari **Chart.js** yang diselaraskan dengan **INLIFE SaaS Design System**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🔑 Akun Login Pengujian (Testing Accounts)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Terdapat 3 (tiga) role dengan hak akses berbeda yang sudah otomatis terbuat di database untuk memudahkan pengujian:
 
-## Learning Laravel
+| Role | Email | Password | Kegunaan & Hak Akses |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@inventory.test` | `password` | **Akses Penuh:** Manajemen user, kelola kategori, kelola produk, transaksi peminjaman, return barang, dan lihat dashboard laporan. |
+| **Staff** | `staff@inventory.test` | `password` | **Operator:** Kelola kategori, kelola produk, membuat transaksi peminjaman baru, dan memproses pengembalian barang. |
+| **Manager** | `manager@inventory.test` | `password` | **Supervisor:** Hanya bisa melihat dashboard laporan dan daftar barang/kategori (akses *Read-Only*). |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🚀 Panduan Instalasi & Menjalankan Project
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Pilih salah satu dari 2 cara menjalankan aplikasi di bawah ini sesuai dengan preferensi lingkungan kerja Anda:
 
-## Agentic Development
+### METODE 1: Menggunakan Docker (Sangat Direkomendasikan)
+*Metode ini sangat mudah karena Anda tidak perlu menginstal PHP, Composer, atau MySQL secara lokal di komputer Anda.*
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+#### Prasyarat:
+- Pastikan aplikasi [Docker Desktop](https://www.docker.com/products/docker-desktop/) sudah terinstal dan sedang berjalan di komputer Anda.
 
+#### Langkah-langkah:
+1. **Salin berkas konfigurasi (`.env`)**
+   Buka terminal di folder project ini dan jalankan perintah:
+   ```bash
+   cp .env.example .env
+   ```
+   *(Konfigurasi database default di dalam file `.env` sudah otomatis cocok dengan container Docker MySQL).*
+
+2. **Nyalakan container Docker**
+   Lakukan build dan jalankan service di background:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+3. **Install dependensi PHP (Composer)**
+   Jalankan perintah ini untuk mengunduh package Laravel di dalam container:
+   ```bash
+   docker-compose exec app composer install
+   ```
+
+4. **Buat Application Key**
+   ```bash
+   docker-compose exec app php artisan key:generate
+   ```
+
+5. **Jalankan Migrasi Database & Seeding Data**
+   Perintah ini akan membuat tabel database sekaligus mengisi data awal pengujian (kategori, produk, dan user akun):
+   ```bash
+   docker-compose exec app php artisan migrate --seed
+   ```
+
+6. **Buat Link Storage (untuk foto produk)**
+   ```bash
+   docker-compose exec app php artisan storage:link
+   ```
+
+7. **Compile Asset Frontend (Tailwind & JS)**
+   Jalankan perintah npm di komputer lokal Anda:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+8. **Buka Aplikasi di Browser 🎉**
+   Aplikasi Anda siap diakses melalui URL berikut:
+   - **Aplikasi Web**: [http://localhost:8000](http://localhost:8000)
+   - **phpMyAdmin (Manajemen Database)**: [http://localhost:8081](http://localhost:8081) (Username: `root` \| Password: `root`)
+
+*Untuk menghentikan container Docker jika sudah selesai:*
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+docker-compose down
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+### METODE 2: Menggunakan Server PHP Lokal (Tanpa Docker)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Prasyarat:
+- PHP versi 8.3 atau lebih baru.
+- MySQL Server versi 8.0 atau lebih baru.
+- [Composer](https://getcomposer.org/) terinstal.
+- [Node.js & npm](https://nodejs.org/) terinstal.
 
-## Code of Conduct
+#### Langkah-langkah:
+1. **Buat Database Baru**
+   Masuk ke database MySQL lokal Anda (misal via phpMyAdmin atau CLI) lalu jalankan perintah:
+   ```sql
+   CREATE DATABASE inventory_management;
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Salin berkas `.env` dan sesuaikan koneksi database**
+   ```bash
+   cp .env.example .env
+   ```
+   Buka file `.env` yang baru dibuat dengan text editor, lalu ubah bagian database menjadi:
+   ```env
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=inventory_management
+   DB_USERNAME=username_mysql_anda
+   DB_PASSWORD=password_mysql_anda
+   ```
 
-## Security Vulnerabilities
+3. **Install dependensi PHP**
+   ```bash
+   composer install
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. **Buat Application Key**
+   ```bash
+   php artisan key:generate
+   ```
 
-## License
+5. **Jalankan Migrasi & Seeding**
+   ```bash
+   php artisan migrate --seed
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. **Buat Link Storage**
+   ```bash
+   php artisan storage:link
+   ```
+
+7. **Install & Jalankan Node compiler**
+   ```bash
+   npm install
+   ```
+   Kompilasi asset untuk siap digunakan:
+   ```bash
+   npm run build
+   ```
+
+8. **Nyalakan Server Lokal**
+   Buka 2 tab terminal terpisah untuk menjalankan server backend dan development server frontend secara bersamaan:
+
+   - **Terminal 1 (Server PHP):**
+     ```bash
+     php artisan serve --port=8000
+     ```
+   - **Terminal 2 (Server Vite untuk Hot-Reload):**
+     ```bash
+     npm run dev
+     ```
+
+9. **Buka Aplikasi di Browser 🎉**
+   Aplikasi Anda siap diakses melalui URL: [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 📊 Dokumentasi API (Postman Collection & Environment)
+
+Untuk memudahkan pengujian dan pemahaman integrasi endpoint backend, berkas koleksi dan environment Postman telah disediakan secara lengkap di root direktori:
+
+- **Collection**: [postman_collection.json](./postman_collection.json) (terdapat 6 folder kategori module lengkap dengan auto-headers, pre-request scripts CSRF, form-data, query parameters, dan test assertions).
+- **Environment**: [postman_environment.json](./postman_environment.json) (berisi variabel `base_url`, kredensial uji coba, dan ID referensi untuk pengujian CRUD lokal).
+
+### Cara Import & Uji di Postman:
+1. Buka aplikasi **Postman**.
+2. Klik tombol **Import** di sisi kiri atas, lalu pilih kedua file: `postman_collection.json` dan `postman_environment.json`.
+3. Pada pojok kanan atas Postman, aktifkan environment **`Inventory Management System - Local Dev`**.
+4. Lakukan request **1. Auth -> Sanctum CSRF Cookie** terlebih dahulu untuk menginisialisasi cookie keamanan Laravel Sanctum.
+5. Lakukan request **1. Auth -> Login as Admin / Staff / Manager** agar session cookie dan state login tersimpan otomatis.
+6. **Otomatisasi Penuh**: Anda dapat langsung menguji endpoint lainnya di folder *Profile*, *Dashboard*, *Categories*, *Products*, dan *Borrowings*. Token CSRF (`X-XSRF-TOKEN`) akan disisipkan secara otomatis oleh script pada setiap request modifikasi data!
+

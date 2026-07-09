@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// CSRF Cookie initialization endpoint for Postman / API testing compatibility
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->noContent();
+});
+
 // Redirect root to dashboard (Breeze auth handles the redirect for guests)
 Route::get('/', function () {
     return redirect()->route('dashboard');
